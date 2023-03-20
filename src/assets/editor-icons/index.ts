@@ -1,0 +1,6 @@
+export { default as IconAlignCenter } from './IconAlignCenter.svg'
+export { default as IconAlignLeft } from './IconAlignLeft.svg'
+export { default as IconAlignRight } from './IconAlignRight.svg'
+export { default as IconDelete } from './IconDelete.svg'
+export { default as IconFloatLeft } from './IconFloatLeft.svg'
+export { default as IconFloatRight } from './IconFloatRight.svg'
