@@ -3,7 +3,7 @@ import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
 import { ref } from 'vue';
 import { ResizableMedia } from '../../src/components/resizableMedia'
-import { content } from '../../src/components/sampleData'
+import { content } from './sampleData'
 
 const editor = useEditor({
   content: content,
