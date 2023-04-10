@@ -245,6 +245,7 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
   <node-view-wrapper
     as="article"
     class="media-node-view flex pos-relative not-prose"
+    style="display: inline-block;"
     :class="[
       `${(isFloat && `f-${props.node.attrs.dataFloat}`) || ''}`,
       `${(isAlign && `align-${props.node.attrs.dataAlign}`) || ''}`,
