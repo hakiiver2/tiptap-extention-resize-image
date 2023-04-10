@@ -27,7 +27,8 @@ const mediaType = computed<'img' | 'video'>(
 const resizableImg = ref<HTMLImageElement | HTMLVideoElement | null>(null) // template ref
 
 const aspectRatio = ref(0)
-
+const viewContainerHeight = ref(0)
+const viewContainerWidth = ref(0)
 const proseMirrorContainerWidth = ref(0)
 
 const mediaActionActiveState = ref<Record<string, boolean>>({})
@@ -69,7 +70,10 @@ const mediaSetupOnLoad = () => {
             onHorizontalResize('left', 0)
         }, 200)
     } else {
-        resizableImg.value.onload = () => {
+        resizableImg.value.onload = (v) => {
+            viewContainerHeight.value = resizableImg.value.parentNode.parentNode.parentNode.parentNode.clientHeight
+            viewContainerWidth.value = resizableImg.value.parentNode.parentNode.parentNode.parentNode.clientWidth
+            
             // Aspect Ratio from its original size
             aspectRatio.value =
                 (resizableImg.value as HTMLImageElement).naturalWidth /
@@ -146,7 +150,10 @@ const onHorizontalResize = (
 
     if (limitWidthOrHeightToFiftyPixels(newMediaDimensions)) return
 
+    
+    console.log({viewContainerHeight: viewContainerHeight.value, viewContainerWidth: viewContainerWidth.value})
     props.updateAttributes(newMediaDimensions)
+    props.updateAttributes({viewContainerHeight: viewContainerHeight.value, viewContainerWidth: viewContainerWidth.value})
 }
 
 const onHorizontalMouseMove = (e: MouseEvent) => {
@@ -187,6 +194,9 @@ const stopVerticalResize = () => {
 
 const onVerticalMouseMove = (e: MouseEvent) => {
     if (!isVerticalResizeActive.value) return
+    console.log(e)
+    console.log(e.srcElement.parentNode.parentNode.parentNode.parentNode)
+    console.log(e.srcElement.parentNode.parentNode.parentNode.parentNode.clientWidth)
 
     const { clientY } = e
 
@@ -234,6 +244,7 @@ const onVerticalMouseMove = (e: MouseEvent) => {
     if (limitWidthOrHeightToFiftyPixels(newMediaDimensions)) return
 
     props.updateAttributes(newMediaDimensions)
+    props.updateAttributes({viewContainerHeight: viewContainerHeight.value, viewContainerWidth: viewContainerWidth.value})
 }
 
 const isFloat = computed<boolean>(() => !!props.node.attrs.dataFloat)

@@ -16,6 +16,8 @@ declare module '@tiptap/core' {
                 title?: string
                 width?: string
                 height?: string
+                viewContainerHeight?: string,
+                viewContainerWidth?: string,
             }) => ReturnType
         }
     }
@@ -67,6 +69,12 @@ export const ResizableMedia = Node.create<MediaOptions>({
                 default: '100%',
             },
             height: {
+                default: 'auto',
+            },
+            viewContainerHeight: {
+                default: 'auto',
+            },
+            viewContainerWidth: {
                 default: 'auto',
             },
             dataAlign: {
