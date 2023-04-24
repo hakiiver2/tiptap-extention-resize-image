@@ -73,9 +73,11 @@ const mediaSetupOnLoad = () => {
         }, 200)
     } else {
         resizableImg.value.onload = (v) => {
-            viewContainerHeight.value = resizableImg.value.parentNode.parentNode.parentNode.parentNode.clientHeight
-            viewContainerWidth.value = resizableImg.value.parentNode.parentNode.parentNode.parentNode.clientWidth
-            
+            viewContainerHeight.value =
+                resizableImg.value.parentNode.parentNode.parentNode.parentNode.clientHeight
+            viewContainerWidth.value =
+                resizableImg.value.parentNode.parentNode.parentNode.parentNode.clientWidth
+
             // Aspect Ratio from its original size
             aspectRatio.value =
                 (resizableImg.value as HTMLImageElement).naturalWidth /
@@ -131,19 +133,28 @@ const onInitResize = () => {
         width: resizableImg.value?.width,
         height: resizableImg.value?.height,
     }
-    widthPercent.value = resizableImg.value?.getAttribute('widthPercent') ? resizableImg.value.getAttribute('widthPercent') : 100
+    widthPercent.value = resizableImg.value?.getAttribute('widthPercent')
+        ? resizableImg.value.getAttribute('widthPercent')
+        : 100
 
     const newMediaDimensions = {
         width: -1,
         height: -1,
     }
 
-    const transWidthPercent = isNaN(parseFloat(widthPercent.value)) ? 100 : parseFloat(widthPercent.value)
-    viewContainerWidth.value = isNaN(parseFloat(resizableImg.value?.getAttribute('viewContainerWidth'))) ? -1 : parseFloat(resizableImg.value.getAttribute('viewContainerWidth'))
+    const transWidthPercent = isNaN(parseFloat(widthPercent.value))
+        ? 100
+        : parseFloat(widthPercent.value)
+    viewContainerWidth.value = isNaN(
+        parseFloat(resizableImg.value?.getAttribute('viewContainerWidth'))
+    )
+        ? -1
+        : parseFloat(resizableImg.value.getAttribute('viewContainerWidth'))
     if (viewContainerWidth.value == -1) {
         newMediaDimensions.width = currentMediaDimensions.width
     } else {
-        newMediaDimensions.width = viewContainerWidth.value * transWidthPercent / 100
+        newMediaDimensions.width =
+            (viewContainerWidth.value * transWidthPercent) / 100
     }
 
     if (newMediaDimensions.width > proseMirrorContainerWidth.value) {
@@ -191,11 +202,15 @@ const onHorizontalResize = (
 
     if (limitWidthOrHeightToFiftyPixels(newMediaDimensions)) return
 
-    
-    widthPercent.value = newMediaDimensions.width / viewContainerWidth.value * 100
+    widthPercent.value =
+        (newMediaDimensions.width / viewContainerWidth.value) * 100
     console.log(widthPercent)
     props.updateAttributes(newMediaDimensions)
-    props.updateAttributes({viewContainerHeight: viewContainerHeight.value, viewContainerWidth: viewContainerWidth.value, widthPercent: widthPercent.value})
+    props.updateAttributes({
+        viewContainerHeight: viewContainerHeight.value,
+        viewContainerWidth: viewContainerWidth.value,
+        widthPercent: widthPercent.value,
+    })
 }
 
 const onHorizontalMouseMove = (e: MouseEvent) => {
@@ -283,7 +298,10 @@ const onVerticalMouseMove = (e: MouseEvent) => {
     if (limitWidthOrHeightToFiftyPixels(newMediaDimensions)) return
 
     props.updateAttributes(newMediaDimensions)
-    props.updateAttributes({viewContainerHeight: viewContainerHeight.value, viewContainerWidth: viewContainerWidth.value})
+    props.updateAttributes({
+        viewContainerHeight: viewContainerHeight.value,
+        viewContainerWidth: viewContainerWidth.value,
+    })
 }
 
 const isFloat = computed<boolean>(() => !!props.node.attrs.dataFloat)
@@ -292,104 +310,104 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
 </script>
 
 <template>
-  <node-view-wrapper
-    as="article"
-    class="media-node-view flex pos-relative not-prose"
-    style="display: inline-block;"
-    :class="[
-      `${(isFloat && `f-${props.node.attrs.dataFloat}`) || ''}`,
-      `${(isAlign && `align-${props.node.attrs.dataAlign}`) || ''}`,
-    ]"
-  >
-    <tippy :interactive="true">
-      <div class="w-fit flex relative">
-        <img
-          v-if="mediaType === 'img'"
-          v-bind="node.attrs"
-          ref="resizableImg"
-          class="rounded-lg"
-          :class="[
-            `${
-              (isFloat &&
-                `float-${props.node.attrs.dataFloat}`) ||
-              ''
-            }`,
-            `${
-              (isAlign &&
-                `align-${props.node.attrs.dataAlign}`) ||
-              ''
-            }`,
-          ]"
-          draggable="true"
-        >
+    <node-view-wrapper
+        as="article"
+        class="media-node-view flex pos-relative not-prose"
+        style="display: inline-block"
+        :class="[
+            `${(isFloat && `f-${props.node.attrs.dataFloat}`) || ''}`,
+            `${(isAlign && `align-${props.node.attrs.dataAlign}`) || ''}`,
+        ]"
+    >
+        <tippy :interactive="true">
+            <div class="w-fit flex relative">
+                <img
+                    v-if="mediaType === 'img'"
+                    v-bind="node.attrs"
+                    ref="resizableImg"
+                    class="rounded-lg"
+                    :class="[
+                        `${
+                            (isFloat &&
+                                `float-${props.node.attrs.dataFloat}`) ||
+                            ''
+                        }`,
+                        `${
+                            (isAlign &&
+                                `align-${props.node.attrs.dataAlign}`) ||
+                            ''
+                        }`,
+                    ]"
+                    draggable="true"
+                />
 
-        <video
-          v-else-if="mediaType === 'video'"
-          v-bind="node.attrs"
-          ref="resizableImg"
-          class="rounded-lg"
-          :class="[
-            `${
-              (isFloat &&
-                `float-${props.node.attrs.dataFloat}`) ||
-              ''
-            }`,
-            `${
-              (isAlign &&
-                `align-${props.node.attrs.dataAlign}`) ||
-              ''
-            }`,
-          ]"
-          draggable="true"
-          controls="true"
-        >
-          <source :src="node.attrs.src">
-        </video>
+                <video
+                    v-else-if="mediaType === 'video'"
+                    v-bind="node.attrs"
+                    ref="resizableImg"
+                    class="rounded-lg"
+                    :class="[
+                        `${
+                            (isFloat &&
+                                `float-${props.node.attrs.dataFloat}`) ||
+                            ''
+                        }`,
+                        `${
+                            (isAlign &&
+                                `align-${props.node.attrs.dataAlign}`) ||
+                            ''
+                        }`,
+                    ]"
+                    draggable="true"
+                    controls="true"
+                >
+                    <source :src="node.attrs.src" />
+                </video>
 
-        <div
-          class="horizontal-resize-handle"
-          :class="{
-            'horizontal-resize-active': isHorizontalResizeActive,
-          }"
-          title="Resize"
-          @mousedown="startHorizontalResize"
-          @mouseup="stopHorizontalResize"
-        />
+                <div
+                    class="horizontal-resize-handle"
+                    :class="{
+                        'horizontal-resize-active': isHorizontalResizeActive,
+                    }"
+                    title="Resize"
+                    @mousedown="startHorizontalResize"
+                    @mouseup="stopHorizontalResize"
+                />
 
-        <div
-          class="vertical-resize-handle"
-          :class="{
-            'vertical-resize-active': isVerticalResizeActive,
-          }"
-          title="Resize"
-          @mousedown="startVerticalResize"
-          @mouseup="stopVerticalResize"
-        />
-      </div>
+                <div
+                    class="vertical-resize-handle"
+                    :class="{
+                        'vertical-resize-active': isVerticalResizeActive,
+                    }"
+                    title="Resize"
+                    @mousedown="startVerticalResize"
+                    @mouseup="stopVerticalResize"
+                />
+            </div>
 
-      <template #content>
-        <section class="image-actions-container">
-          <button
-            v-for="(mediaAction, i) in resizableMediaActions"
-            :key="i"
-            v-tippy="{
-              content: mediaAction.tooltip,
-              placement: 'top',
-            }"
-            :content="mediaAction.tooltip"
-            class="btn btn-sm btn-ghost image-action-button"
-            @click="
-              mediaAction.tooltip === 'Delete'
-                ? mediaAction.delete?.(deleteNode)
-                : mediaAction.action?.(updateAttributes)
-            "
-          >
-            <InlineSvg :src="mediaAction.icon" />
-          </button>
-        </section>
-      </template>
-    </tippy>
-  </node-view-wrapper>
+            <template #content>
+                <section class="image-actions-container">
+                    <button
+                        v-for="(mediaAction, i) in resizableMediaActions"
+                        :key="i"
+                        v-tippy="{
+                            content: mediaAction.tooltip,
+                            placement: 'top',
+                        }"
+                        :content="mediaAction.tooltip"
+                        class="btn btn-sm btn-ghost image-action-button"
+                        @click="
+                            mediaAction.tooltip === 'Delete'
+                                ? mediaAction.delete?.(deleteNode)
+                                : mediaAction.action?.(updateAttributes)
+                        "
+                    >
+                        <InlineSvg :src="mediaAction.icon" />
+                    </button>
+                </section>
+            </template>
+        </tippy>
+    </node-view-wrapper>
 </template>
 
 <style lang="scss">

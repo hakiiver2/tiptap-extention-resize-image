@@ -16,9 +16,9 @@ declare module '@tiptap/core' {
                 title?: string
                 width?: string
                 height?: string
-                viewContainerHeight?: string,
-                viewContainerWidth?: string,
-                widthPercent?: string,
+                viewContainerHeight?: string
+                viewContainerWidth?: string
+                widthPercent?: string
             }) => ReturnType
         }
     }
