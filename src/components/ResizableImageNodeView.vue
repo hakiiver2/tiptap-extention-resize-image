@@ -29,6 +29,8 @@ const resizableImg = ref<HTMLImageElement | HTMLVideoElement | null>(null) // te
 const aspectRatio = ref(0)
 const viewContainerHeight = ref(0)
 const viewContainerWidth = ref(0)
+const widthPercent = ref(0)
+
 const proseMirrorContainerWidth = ref(0)
 
 const mediaActionActiveState = ref<Record<string, boolean>>({})
@@ -51,7 +53,7 @@ watch(
 const mediaSetupOnLoad = () => {
     // ! TODO: move this to extension storage
     const proseMirrorContainerDiv = document.querySelector('.ProseMirror')
-
+    console.log(proseMirrorContainerDiv)
     if (proseMirrorContainerDiv)
         proseMirrorContainerWidth.value = proseMirrorContainerDiv?.clientWidth
 
@@ -79,7 +81,8 @@ const mediaSetupOnLoad = () => {
                 (resizableImg.value as HTMLImageElement).naturalWidth /
                 (resizableImg.value as HTMLImageElement).naturalHeight
 
-            onHorizontalResize('left', 0)
+            onInitResize()
+            // onHorizontalResize('left', 0)
         }
     }
 
@@ -114,6 +117,44 @@ const stopHorizontalResize = () => {
 
     document.removeEventListener('mousemove', onHorizontalMouseMove)
     document.removeEventListener('mouseup', stopHorizontalResize)
+}
+
+const onInitResize = () => {
+    if (!resizableImg.value) {
+        console.error('Media ref is undefined|null', {
+            resizableImg: resizableImg.value,
+        })
+        return
+    }
+
+    const currentMediaDimensions = {
+        width: resizableImg.value?.width,
+        height: resizableImg.value?.height,
+    }
+    widthPercent.value = resizableImg.value?.getAttribute('widthPercent') ? resizableImg.value.getAttribute('widthPercent') : 100
+
+    const newMediaDimensions = {
+        width: -1,
+        height: -1,
+    }
+
+    const transWidthPercent = isNaN(parseFloat(widthPercent.value)) ? 100 : parseFloat(widthPercent.value)
+    viewContainerWidth.value = isNaN(parseFloat(resizableImg.value?.getAttribute('viewContainerWidth'))) ? -1 : parseFloat(resizableImg.value.getAttribute('viewContainerWidth'))
+    if (viewContainerWidth.value == -1) {
+        newMediaDimensions.width = currentMediaDimensions.width
+    } else {
+        newMediaDimensions.width = viewContainerWidth.value * transWidthPercent / 100
+    }
+
+    if (newMediaDimensions.width > proseMirrorContainerWidth.value) {
+        newMediaDimensions.width = proseMirrorContainerWidth.value
+    }
+
+    newMediaDimensions.height = newMediaDimensions.width / aspectRatio.value
+
+    if (limitWidthOrHeightToFiftyPixels(newMediaDimensions)) return
+
+    props.updateAttributes(newMediaDimensions)
 }
 
 const onHorizontalResize = (
@@ -151,9 +192,10 @@ const onHorizontalResize = (
     if (limitWidthOrHeightToFiftyPixels(newMediaDimensions)) return
 
     
-    console.log({viewContainerHeight: viewContainerHeight.value, viewContainerWidth: viewContainerWidth.value})
+    widthPercent.value = newMediaDimensions.width / viewContainerWidth.value * 100
+    console.log(widthPercent)
     props.updateAttributes(newMediaDimensions)
-    props.updateAttributes({viewContainerHeight: viewContainerHeight.value, viewContainerWidth: viewContainerWidth.value})
+    props.updateAttributes({viewContainerHeight: viewContainerHeight.value, viewContainerWidth: viewContainerWidth.value, widthPercent: widthPercent.value})
 }
 
 const onHorizontalMouseMove = (e: MouseEvent) => {
@@ -194,9 +236,6 @@ const stopVerticalResize = () => {
 
 const onVerticalMouseMove = (e: MouseEvent) => {
     if (!isVerticalResizeActive.value) return
-    console.log(e)
-    console.log(e.srcElement.parentNode.parentNode.parentNode.parentNode)
-    console.log(e.srcElement.parentNode.parentNode.parentNode.parentNode.clientWidth)
 
     const { clientY } = e
 
