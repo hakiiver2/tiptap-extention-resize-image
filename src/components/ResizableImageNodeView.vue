@@ -93,6 +93,18 @@ const mediaSetupOnLoad = () => {
 
 onMounted(() => mediaSetupOnLoad())
 
+const isCornerResizeActive = ref(true)
+
+const startCornerResize = (e: MouseEvent) => {
+    isCornerResizeActive.value = true
+
+}
+
+const stopCornerResize = () => {
+    isCornerResizeActive.value = false
+
+}
+
 const isHorizontalResizeActive = ref(false)
 
 const lastCursorX = ref(-1)
@@ -383,6 +395,16 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
                     @mousedown="startVerticalResize"
                     @mouseup="stopVerticalResize"
                 />
+
+                <div
+                    class="corner-resize-handle"
+                    :class="{
+                        'corner-resize-active': isCornerResizeActive,
+                    }"
+                    title="Resize"
+                    @mousedown="startCornerResize"
+                    @mouseup="stopCornerResize"
+                />
             </div>
 
             <template #content>
@@ -435,7 +457,8 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
     }
 
     .horizontal-resize-handle,
-    .vertical-resize-handle {
+    .vertical-resize-handle, 
+    .corner-resize-handle {
         @apply absolute hover:bg-blue-200 z-50 opacity-50;
     }
 
@@ -445,6 +468,9 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
 
     .vertical-resize-handle {
         @apply w-full h-2 bottom-0 left-0 cursor-row-resize;
+    }
+    .corner-resize-active {
+        @apply w-4 h-4 bottom-0 right-0 cursor-nwse-resize;
     }
 }
 
