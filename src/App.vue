@@ -1,25 +1,19 @@
 <script setup lang="ts">
 import { useEditor, EditorContent } from '@tiptap/vue-3'
 import StarterKit from '@tiptap/starter-kit'
-import { ref } from 'vue';
+import { ref } from 'vue'
 import { ResizableMedia } from './components/resizableMedia'
 import { content } from './components/sampleData'
 
-
 const editor = useEditor({
-  content: content,
-  extensions: [
-    StarterKit,
-    ResizableMedia,
-  ],
-  editorProps: {
-    attributes: {
-      class: 'focus:outline-none prose mx-auto'
-    }
-  }
+    content: content,
+    extensions: [StarterKit, ResizableMedia],
+    editorProps: {
+        attributes: {
+            class: 'focus:outline-none prose mx-auto',
+        },
+    },
 })
-
-
 </script>
 
 <template>
