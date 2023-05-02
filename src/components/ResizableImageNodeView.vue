@@ -384,114 +384,114 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
 </script>
 
 <template>
-    <node-view-wrapper
-        as="article"
-        class="media-node-view flex pos-relative not-prose"
-        style="display: inline-block"
-        :class="[
-            `${(isFloat && `f-${props.node.attrs.dataFloat}`) || ''}`,
-            `${(isAlign && `align-${props.node.attrs.dataAlign}`) || ''}`,
-        ]"
-    >
-        <tippy :interactive="true">
-            <div class="w-fit flex relative">
-                <img
-                    v-if="mediaType === 'img'"
-                    v-bind="node.attrs"
-                    ref="resizableImg"
-                    class="rounded-lg"
-                    :class="[
-                        `${
-                            (isFloat &&
-                                `float-${props.node.attrs.dataFloat}`) ||
-                            ''
-                        }`,
-                        `${
-                            (isAlign &&
-                                `align-${props.node.attrs.dataAlign}`) ||
-                            ''
-                        }`,
-                    ]"
-                    draggable="true"
-                />
+  <node-view-wrapper
+    as="article"
+    class="media-node-view flex pos-relative not-prose"
+    style="display: inline-block"
+    :class="[
+      `${(isFloat && `f-${props.node.attrs.dataFloat}`) || ''}`,
+      `${(isAlign && `align-${props.node.attrs.dataAlign}`) || ''}`,
+    ]"
+  >
+    <tippy :interactive="true">
+      <div class="w-fit flex relative">
+        <img
+          v-if="mediaType === 'img'"
+          v-bind="node.attrs"
+          ref="resizableImg"
+          class="rounded-lg"
+          :class="[
+            `${
+              (isFloat &&
+                `float-${props.node.attrs.dataFloat}`) ||
+              ''
+            }`,
+            `${
+              (isAlign &&
+                `align-${props.node.attrs.dataAlign}`) ||
+              ''
+            }`,
+          ]"
+          draggable="true"
+        >
 
-                <video
-                    v-else-if="mediaType === 'video'"
-                    v-bind="node.attrs"
-                    ref="resizableImg"
-                    class="rounded-lg"
-                    :class="[
-                        `${
-                            (isFloat &&
-                                `float-${props.node.attrs.dataFloat}`) ||
-                            ''
-                        }`,
-                        `${
-                            (isAlign &&
-                                `align-${props.node.attrs.dataAlign}`) ||
-                            ''
-                        }`,
-                    ]"
-                    draggable="true"
-                    controls="true"
-                >
-                    <source :src="node.attrs.src" />
-                </video>
+        <video
+          v-else-if="mediaType === 'video'"
+          v-bind="node.attrs"
+          ref="resizableImg"
+          class="rounded-lg"
+          :class="[
+            `${
+              (isFloat &&
+                `float-${props.node.attrs.dataFloat}`) ||
+              ''
+            }`,
+            `${
+              (isAlign &&
+                `align-${props.node.attrs.dataAlign}`) ||
+              ''
+            }`,
+          ]"
+          draggable="true"
+          controls="true"
+        >
+          <source :src="node.attrs.src">
+        </video>
 
-                <div
-                    class="horizontal-resize-handle"
-                    :class="{
-                        'horizontal-resize-active': isHorizontalResizeActive,
-                    }"
-                    title="Resize"
-                    @mousedown="startHorizontalResize"
-                    @mouseup="stopHorizontalResize"
-                />
+        <div
+          class="horizontal-resize-handle"
+          :class="{
+            'horizontal-resize-active': isHorizontalResizeActive,
+          }"
+          title="Resize"
+          @mousedown="startHorizontalResize"
+          @mouseup="stopHorizontalResize"
+        />
 
-                <div
-                    class="vertical-resize-handle"
-                    :class="{
-                        'vertical-resize-active': isVerticalResizeActive,
-                    }"
-                    title="Resize"
-                    @mousedown="startVerticalResize"
-                    @mouseup="stopVerticalResize"
-                />
+        <div
+          class="vertical-resize-handle"
+          :class="{
+            'vertical-resize-active': isVerticalResizeActive,
+          }"
+          title="Resize"
+          @mousedown="startVerticalResize"
+          @mouseup="stopVerticalResize"
+        />
 
-                <div
-                    class="corner-resize-handle"
-                    :class="{
-                        'corner-resize-active': isCornerResizeActive,
-                    }"
-                    title="Resize"
-                    @mousedown="startCornerResize"
-                    @mouseup="stopCornerResize"
-                />
-            </div>
+        <div
+          class="corner-resize-handle"
+          :class="{
+            'corner-resize-active': isCornerResizeActive,
+          }"
+          title="Resize"
+          @mousedown="startCornerResize"
+          @mouseup="stopCornerResize"
+        />
+      </div>
 
-            <template #content>
-                <section class="image-actions-container">
-                    <button
-                        v-for="(mediaAction, i) in resizableMediaActions"
-                        :key="i"
-                        v-tippy="{
-                            content: mediaAction.tooltip,
-                            placement: 'top',
-                        }"
-                        :content="mediaAction.tooltip"
-                        class="btn btn-sm btn-ghost image-action-button"
-                        @click="
-                            mediaAction.tooltip === 'Delete'
-                                ? mediaAction.delete?.(deleteNode)
-                                : mediaAction.action?.(updateAttributes)
-                        "
-                    >
-                        <InlineSvg :src="mediaAction.icon" />
-                    </button>
-                </section>
-            </template>
-        </tippy>
-    </node-view-wrapper>
+      <template #content>
+        <section class="image-actions-container">
+          <button
+            v-for="(mediaAction, i) in resizableMediaActions"
+            :key="i"
+            v-tippy="{
+              content: mediaAction.tooltip,
+              placement: 'top',
+            }"
+            :content="mediaAction.tooltip"
+            class="btn btn-sm btn-ghost image-action-button"
+            @click="
+              mediaAction.tooltip === 'Delete'
+                ? mediaAction.delete?.(deleteNode)
+                : mediaAction.action?.(updateAttributes)
+            "
+          >
+            <InlineSvg :src="mediaAction.icon" />
+          </button>
+        </section>
+      </template>
+    </tippy>
+  </node-view-wrapper>
 </template>
 
 <style lang="scss">
