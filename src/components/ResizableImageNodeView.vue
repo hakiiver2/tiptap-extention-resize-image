@@ -93,6 +93,80 @@ const mediaSetupOnLoad = () => {
 
 onMounted(() => mediaSetupOnLoad())
 
+const isCornerResizeActive = ref(false)
+const lastCursorY = ref(-1)
+
+const startCornerResize = (e: MouseEvent) => {
+    isCornerResizeActive.value = true
+    lastCursorY.value = e.clientY
+
+    document.addEventListener('mousemove', onCornerMouseMove)
+    document.addEventListener('mouseup', stopCornerResize)
+}
+
+const stopCornerResize = () => {
+    isCornerResizeActive.value = false
+    lastCursorY.value = -1
+
+    document.removeEventListener('mousemove', onCornerMouseMove)
+    document.removeEventListener('mouseup', stopCornerResize)
+}
+
+const onCornerMouseMove = (e: MouseEvent) => {
+    if (!isCornerResizeActive.value) return
+
+    const { clientY } = e
+
+    const diff = lastCursorY.value - clientY
+
+    lastCursorY.value = clientY
+
+    if (diff === 0) return
+
+    const directionOfMouseMove: 'up' | 'down' = diff > 0 ? 'up' : 'down'
+
+    if (!resizableImg.value) {
+        console.error('Media ref is undefined|null', {
+            resizableImg: resizableImg.value,
+        })
+        return
+    }
+
+    const currentMediaDimensions = {
+        width: resizableImg.value?.width,
+        height: resizableImg.value?.height,
+    }
+
+    const newMediaDimensions = {
+        width: -1,
+        height: -1,
+    }
+
+    if (directionOfMouseMove === 'up') {
+        newMediaDimensions.height =
+            currentMediaDimensions.height - Math.abs(diff)
+    } else {
+        newMediaDimensions.height =
+            currentMediaDimensions.height + Math.abs(diff)
+    }
+
+    newMediaDimensions.width = newMediaDimensions.height * aspectRatio.value
+
+    if (newMediaDimensions.width > proseMirrorContainerWidth.value) {
+        newMediaDimensions.width = proseMirrorContainerWidth.value
+
+        newMediaDimensions.height = newMediaDimensions.width / aspectRatio.value
+    }
+
+    if (limitWidthOrHeightToFiftyPixels(newMediaDimensions)) return
+
+    props.updateAttributes(newMediaDimensions)
+    props.updateAttributes({
+        viewContainerHeight: viewContainerHeight.value,
+        viewContainerWidth: viewContainerWidth.value,
+    })
+}
+
 const isHorizontalResizeActive = ref(false)
 
 const lastCursorX = ref(-1)
@@ -231,7 +305,7 @@ const onHorizontalMouseMove = (e: MouseEvent) => {
 
 const isVerticalResizeActive = ref(false)
 
-const lastCursorY = ref(-1)
+// const lastCursorY = ref(-1)
 
 const startVerticalResize = (e: MouseEvent) => {
     isVerticalResizeActive.value = true
@@ -383,6 +457,16 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
                     @mousedown="startVerticalResize"
                     @mouseup="stopVerticalResize"
                 />
+
+                <div
+                    class="corner-resize-handle"
+                    :class="{
+                        'corner-resize-active': isCornerResizeActive,
+                    }"
+                    title="Resize"
+                    @mousedown="startCornerResize"
+                    @mouseup="stopCornerResize"
+                />
             </div>
 
             <template #content>
@@ -435,7 +519,8 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
     }
 
     .horizontal-resize-handle,
-    .vertical-resize-handle {
+    .vertical-resize-handle,
+    .corner-resize-handle {
         @apply absolute hover:bg-blue-200 z-50 opacity-50;
     }
 
@@ -445,6 +530,9 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
 
     .vertical-resize-handle {
         @apply w-full h-2 bottom-0 left-0 cursor-row-resize;
+    }
+    .corner-resize-handle {
+        @apply w-4 h-4 bottom-0 right-0 cursor-nwse-resize;
     }
 }
 
