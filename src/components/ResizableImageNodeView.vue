@@ -94,10 +94,14 @@ const mediaSetupOnLoad = () => {
 onMounted(() => mediaSetupOnLoad())
 
 const isCornerResizeActive = ref(false)
+const isCornerResizing = ref(false)
 const lastCursorY = ref(-1)
 
 const startCornerResize = (e: MouseEvent) => {
+    console.log('startCornerResize')
     isCornerResizeActive.value = true
+    isCornerResizing.value = true
+    console.log(isCornerResizeActive.value)
     lastCursorY.value = e.clientY
 
     document.addEventListener('mousemove', onCornerMouseMove)
@@ -106,6 +110,7 @@ const startCornerResize = (e: MouseEvent) => {
 
 const stopCornerResize = () => {
     isCornerResizeActive.value = false
+    isCornerResizing.value = false
     lastCursorY.value = -1
 
     document.removeEventListener('mousemove', onCornerMouseMove)
@@ -378,6 +383,18 @@ const onVerticalMouseMove = (e: MouseEvent) => {
     })
 }
 
+const onResizableImgClick = (e: MouseEvent) => {
+    e.target.focus()
+}
+
+const onResizableImgFocus = (e: MouseEvent) => {
+    isCornerResizeActive.value = true
+}
+
+const onResizableImgBlur = (e: MouseEvent) => {
+    isCornerResizeActive.value = false
+}
+
 const isFloat = computed<boolean>(() => !!props.node.attrs.dataFloat)
 
 const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
@@ -411,8 +428,17 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
                 `align-${props.node.attrs.dataAlign}`) ||
               ''
             }`,
+            `${
+              (isCornerResizeActive &&
+                `hello`) ||
+              ''
+            }`,
           ]"
           draggable="true"
+          @click="onResizableImgClick"
+          @focus="onResizableImgFocus"
+          @blur="onResizableImgBlur"
+          tabindex="0"
         >
 
         <video
@@ -533,6 +559,9 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
     }
     .corner-resize-handle {
         @apply w-4 h-4 bottom-0 right-0 cursor-nwse-resize;
+    }
+    .corner-resize-active {
+        @apply bg-blue-200
     }
 }
 
