@@ -104,7 +104,8 @@ const startCornerResize = (e: MouseEvent) => {
     console.log(isCornerResizeActive.value)
     lastCursorY.value = e.clientY
 
-    document.addEventListener('mousemove', onCornerMouseMove)
+    // document.addEventListener('mousemove', onCornerMouseMove)
+    document.addEventListener('pointermove', onCornerMouseMove)
     document.addEventListener('mouseup', stopCornerResize)
 }
 
@@ -113,63 +114,66 @@ const stopCornerResize = () => {
     isCornerResizing.value = false
     lastCursorY.value = -1
 
-    document.removeEventListener('mousemove', onCornerMouseMove)
+    // document.removeEventListener('mousemove', onCornerMouseMove)
+    document.removeEventListener('pointermove', onCornerMouseMove)
     document.removeEventListener('mouseup', stopCornerResize)
 }
 
-const onCornerMouseMove = (e: MouseEvent) => {
+const onCornerMouseMove = (event: MouseEvent) => {
     if (!isCornerResizeActive.value) return
+    for (const e of event.getCoalescedEvents()) {
+        const { clientY } = e
 
-    const { clientY } = e
+        const diff = lastCursorY.value - clientY
 
-    const diff = lastCursorY.value - clientY
+        lastCursorY.value = clientY
 
-    lastCursorY.value = clientY
+        if (diff === 0) return
 
-    if (diff === 0) return
+        const directionOfMouseMove: 'up' | 'down' = diff > 0 ? 'up' : 'down'
 
-    const directionOfMouseMove: 'up' | 'down' = diff > 0 ? 'up' : 'down'
+        if (!resizableImg.value) {
+            console.error('Media ref is undefined|null', {
+                resizableImg: resizableImg.value,
+            })
+            return
+        }
 
-    if (!resizableImg.value) {
-        console.error('Media ref is undefined|null', {
-            resizableImg: resizableImg.value,
+        const currentMediaDimensions = {
+            width: resizableImg.value?.width,
+            height: resizableImg.value?.height,
+        }
+
+        const newMediaDimensions = {
+            width: -1,
+            height: -1,
+        }
+
+        if (directionOfMouseMove === 'up') {
+            newMediaDimensions.height =
+                currentMediaDimensions.height - Math.abs(diff)
+        } else {
+            newMediaDimensions.height =
+                currentMediaDimensions.height + Math.abs(diff)
+        }
+
+        newMediaDimensions.width = newMediaDimensions.height * aspectRatio.value
+
+        if (newMediaDimensions.width > proseMirrorContainerWidth.value) {
+            newMediaDimensions.width = proseMirrorContainerWidth.value
+
+            newMediaDimensions.height =
+                newMediaDimensions.width / aspectRatio.value
+        }
+
+        if (limitWidthOrHeightToFiftyPixels(newMediaDimensions)) return
+
+        props.updateAttributes(newMediaDimensions)
+        props.updateAttributes({
+            viewContainerHeight: viewContainerHeight.value,
+            viewContainerWidth: viewContainerWidth.value,
         })
-        return
     }
-
-    const currentMediaDimensions = {
-        width: resizableImg.value?.width,
-        height: resizableImg.value?.height,
-    }
-
-    const newMediaDimensions = {
-        width: -1,
-        height: -1,
-    }
-
-    if (directionOfMouseMove === 'up') {
-        newMediaDimensions.height =
-            currentMediaDimensions.height - Math.abs(diff)
-    } else {
-        newMediaDimensions.height =
-            currentMediaDimensions.height + Math.abs(diff)
-    }
-
-    newMediaDimensions.width = newMediaDimensions.height * aspectRatio.value
-
-    if (newMediaDimensions.width > proseMirrorContainerWidth.value) {
-        newMediaDimensions.width = proseMirrorContainerWidth.value
-
-        newMediaDimensions.height = newMediaDimensions.width / aspectRatio.value
-    }
-
-    if (limitWidthOrHeightToFiftyPixels(newMediaDimensions)) return
-
-    props.updateAttributes(newMediaDimensions)
-    props.updateAttributes({
-        viewContainerHeight: viewContainerHeight.value,
-        viewContainerWidth: viewContainerWidth.value,
-    })
 }
 
 const isHorizontalResizeActive = ref(false)
@@ -428,17 +432,13 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
                 `align-${props.node.attrs.dataAlign}`) ||
               ''
             }`,
-            `${
-              (isCornerResizeActive &&
-                `hello`) ||
-              ''
-            }`,
+            `${(isCornerResizeActive && `hello`) || ''}`,
           ]"
           draggable="true"
+          tabindex="0"
           @click="onResizableImgClick"
           @focus="onResizableImgFocus"
           @blur="onResizableImgBlur"
-          tabindex="0"
         >
 
         <video
@@ -561,7 +561,7 @@ const isAlign = computed<boolean>(() => !!props.node.attrs.dataAlign)
         @apply w-4 h-4 bottom-0 right-0 cursor-nwse-resize;
     }
     .corner-resize-active {
-        @apply bg-blue-200
+        @apply bg-blue-200;
     }
 }
 

@@ -17,7 +17,7 @@ const editor = useEditor({
 </script>
 
 <template>
-    <editor-content :editor="editor" />
+  <editor-content :editor="editor" />
 </template>
 
 <style scoped>
